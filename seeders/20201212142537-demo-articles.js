@@ -12,15 +12,16 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
     */
-    const userRole = await models.Roles.findOne({ where: { name: 'user' } }).id;
     const usersQuery = await models.User.findAll();
-    const usersRoles = usersQuery.map(user => ({
+    const articles = usersQuery.map(user => ({
       userId: user.id,
-      roleId: userRole,
+      title: faker.lorem.sentence(),
+      body: faker.lorem.words(420),
       createdAt: new Date(),
       updatedAt: new Date(),
     }));
-    await queryInterface.bulkInsert('UsersRoles', usersRoles, {});
+    await queryInterface.bulkInsert('Articles', articles, {});
+
   },
 
   down: async (queryInterface, Sequelize) => {
@@ -30,6 +31,6 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
-    await queryInterface.bulkDelete('UsersRoles', null, {});
+    await queryInterface.bulkDelete('Articles', null, {});
   }
 };
