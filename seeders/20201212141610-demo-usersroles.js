@@ -1,5 +1,5 @@
 'use strict';
-const models = require('./models')
+const models = require('../models')
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -12,7 +12,7 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
     */
-    const userRole = await models.Roles.findOne({ where: { name: 'user' } }).id;
+    const userRole = await models.Role.findOne({ where: { name: 'user' } }).id;
     const usersQuery = await models.User.findAll();
     const usersRoles = usersQuery.map(user => ({
       userId: user.id,

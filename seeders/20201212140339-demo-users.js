@@ -1,5 +1,4 @@
 'use strict';
-const models = require('./models')
 const faker = require('faker')
 
 module.exports = {

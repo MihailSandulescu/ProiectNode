@@ -1,5 +1,6 @@
 'use strict';
-const models = require('./models')
+const models = require('../models')
+const faker = require('faker')
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -16,12 +17,12 @@ module.exports = {
     const articleQuery = await models.Article.findAll();
     const comments = usersQuery.map(user => ({
       userId: user.id,
-      articleId: Math.floor(Math.random() * Math.floor(articleQuery.length)),
+      articleId: articleQuery[parseInt(Math.floor(Math.random() * Math.floor(articleQuery.length)))].id,
       body: faker.lorem.words(420),
       createdAt: new Date(),
       updatedAt: new Date(),
     }));
-    await queryInterface.bulkInsert('Articles', articles, {});
+    await queryInterface.bulkInsert('Comments', comments, {});
   },
 
   down: async (queryInterface, Sequelize) => {
@@ -31,6 +32,6 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
-    await queryInterface.bulkDelete('Articles', null, {});
+    await queryInterface.bulkDelete('Comments', null, {});
   }
 };
