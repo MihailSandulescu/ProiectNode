@@ -12,6 +12,8 @@
     "sequelize-cli": "^6.2.0"
   },
   "dependencies": {
+    "express": "^4.17.1",
+    "express-graphql": "^0.12.0",
     "faker": "^5.1.0",
     "graphql": "^15.4.0",
     "npx": "^10.2.2",
