@@ -1,26 +1,58 @@
-const { GraphQLObjectType, GraphQLNonNull, GraphQLInt, GraphQLString } = require('graphql');
+const {GraphQLObjectType, GraphQLNonNull, GraphQLInt, GraphQLString} = require('graphql');
 const models = require('../models');
-const userType = require('./types/UserType')
-const config = require('../config/config');
+const userType = require('./types/UserType');
+const appConfig = require('../config/appConfig')
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const mutationType = new GraphQLObjectType({
-    name: 'Mutation',
-    fields: {
-        createUser: {
-            type: userType,
-            args: {
+        name: 'Mutation',
+        fields: {
+            register: {
+                type: userType,
+                args: {
                     email: {type: GraphQLString},
                     username: {type: GraphQLString},
+                    password: {type: GraphQLString}
                 },
 
-            resolve: async (_, {email, username}) => {
-                const created = await models.User.create({email: email, username: username});
-                return created;
+                resolve: async (_, {email, username, password}, context) => {
+                    const created = await models.User.create({email: email, username: username, password: await bcrypt.hash(password, appConfig.SALT_ROUNDS)});
+                    return created;
+                },
+            },
+
+            login: {
+                type: GraphQLString,
+                args: {
+                    email: {
+                        type: GraphQLNonNull(GraphQLString),
+                    },
+                    password: {
+                        type: GraphQLNonNull(GraphQLString),
+                    },
+                },
+                resolve: async (parent, {email, password}) => {
+                    const user = await models.User.findOne({
+                        where: {
+                            email,
+                        }
+                    });
+
+                    if (user) {
+                        const isValid = await bcrypt.compare(password, user.password);
+                        if (isValid) {
+                            // Pasam `userId` in token pentru a-l folosi la validarea tokenului (authenticationMiddleware)
+                            const token = jwt.sign({userId: user.id}, appConfig.JWTSECRET);
+                            return token;
+                        }
+                    }
+
+                    return null;
+                },
             },
         },
-
-            },
-        }
-        );
+    }
+);
 
 module.exports = mutationType;

@@ -17,7 +17,7 @@ module.exports = {
     const articles = usersQuery.map(user => ({
       userId: user.id,
       title: faker.lorem.sentence(),
-      body: faker.lorem.words(420),
+      body: faker.lorem.words(10),
       createdAt: new Date(),
       updatedAt: new Date(),
     }));

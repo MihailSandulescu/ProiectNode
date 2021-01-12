@@ -18,7 +18,7 @@ module.exports = {
     const comments = usersQuery.map(user => ({
       userId: user.id,
       articleId: articleQuery[parseInt(Math.floor(Math.random() * Math.floor(articleQuery.length)))].id,
-      body: faker.lorem.words(420),
+      body: faker.lorem.words(10),
       createdAt: new Date(),
       updatedAt: new Date(),
     }));

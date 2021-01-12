@@ -6,14 +6,22 @@ const userType = require('./types/UserType');
 const queryType = new GraphQLObjectType({
     name: 'Query',
     fields: {
-        getUser: {
+        user: {
             type: userType,
             args: {
                 id: {
                     type: GraphQLNonNull(GraphQLInt)
                 }
             },
-            resolve: async (_, {id}) => {
+            resolve: async (_, {id}, context) => {
+
+                // `user` vine din `authenticationMiddleware`
+                const { user } = context;
+                // Daca nu exista `user` pe context inseamna ca userul nu este autentificat.
+                if(!user) {
+                    return null;
+                }
+
                 const usr = await models.User.findByPk(id);
                 if (!usr) {
                     throw new Error('no user exists with id ' + id);
@@ -21,7 +29,7 @@ const queryType = new GraphQLObjectType({
                 return usr;
             },
         },
-        getArticle: {
+        article: {
             type: articleType,
             args: {
                 articleId: {
@@ -29,15 +37,15 @@ const queryType = new GraphQLObjectType({
                 }
             },
             resolve: async (_, {articleId}) => {
-                const article = await models.Article.findByPk(articleId, {
-                    include: [
-                        {
-                            model: models.Comment,
-                            //as: "comments"
-                        },
-                    ],
-                })
-                return {id: article.id, body: article.body, comments: await article.getComments()};
+                // `user` vine din `authenticationMiddleware`
+                const { user } = context;
+                // Daca nu exista `user` pe context inseamna ca userul nu este autentificat.
+                if(!user) {
+                    return null;
+                }
+
+
+                return await models.Article.findByPk(articleId);
             }
         },
     }
