@@ -69,10 +69,44 @@ const mutationType = new GraphQLObjectType({
                 const { user } = context;
                 // Daca nu exista `user` pe context inseamna ca userul nu este autentificat.
                 if (!user) {
-                    return null;
+                    throw new Error('Unauthorized');
                 }
 
                 const created = await models.Article.create({ userId: user.id, title: title, body: body });
+                return created;
+            },
+        },
+
+        createComment: {
+            type: articleType,
+            args: {
+                body: {
+                    type: GraphQLNonNull(GraphQLString),
+                },
+                articleId: {
+                    type: GraphQLNonNull(GraphQLInt),
+                }
+            },
+            resolve: async (parent, { body, articleId }, context) => {
+
+                // `user` vine din `authenticationMiddleware`
+                const { user } = context;
+                // Daca nu exista `user` pe context inseamna ca userul nu este autentificat.
+                if (!user) {
+                    return null;
+                }
+
+                const article = await models.Article.findOne({
+                    where: {
+                        id: articleId,
+                    }
+                });
+
+                if (article == null) {
+                    throw new Error('no article exists with id ' + articleId);
+                }
+
+                const created = await models.Comment.create({ articleId: articleId, userId: user.id, body: body });
                 return created;
             },
         }

@@ -13,12 +13,12 @@ const queryType = new GraphQLObjectType({
                     type: GraphQLNonNull(GraphQLInt)
                 }
             },
-            resolve: async (_, {id}, context) => {
+            resolve: async (_, { id }, context) => {
 
                 // `user` vine din `authenticationMiddleware`
                 const { user } = context;
                 // Daca nu exista `user` pe context inseamna ca userul nu este autentificat.
-                if(!user) {
+                if (!user) {
                     return null;
                 }
 
@@ -36,18 +36,38 @@ const queryType = new GraphQLObjectType({
                     type: GraphQLInt
                 }
             },
-            resolve: async (_, {articleId}) => {
+            resolve: async (_, { articleId }, context) => {
                 // `user` vine din `authenticationMiddleware`
                 const { user } = context;
                 // Daca nu exista `user` pe context inseamna ca userul nu este autentificat.
                 if (!user) {
-                    return null;
+                    throw new Error('Unauthorized');
                 }
 
 
                 return await models.Article.findByPk(articleId);
             }
         },
+        comment: {
+            type: articleType,
+            args: {
+                commentId: {
+                    type: GraphQLInt
+                }
+            },
+            resolve: async (_, { commentId }, context) => {
+                // `user` vine din `authenticationMiddleware`
+                const { user } = context;
+                // Daca nu exista `user` pe context inseamna ca userul nu este autentificat.
+                if (!user) {
+                    throw new Error('Unauthorized');
+                }
+
+
+                return await models.Comment.findByPk(commentId);
+            }
+        }
+
     }
 });
 
