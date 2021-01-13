@@ -40,7 +40,7 @@ const queryType = new GraphQLObjectType({
                 // `user` vine din `authenticationMiddleware`
                 const { user } = context;
                 // Daca nu exista `user` pe context inseamna ca userul nu este autentificat.
-                if(!user) {
+                if (!user) {
                     return null;
                 }
 
